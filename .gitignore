@@ -1,0 +1,90 @@
+# Build env file
+/.env
+
+# Temp details to create pull secret
+/key.json
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Eclipse stuff
+.settings/
+.project
+.classpath
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.msi
+*.tar.gz
+*.rar
+*.exe
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+target/
+installers/
+/clients/osm-api/target/
+/clients/osm-api/nbproject/
+/clients/osm-dotnet-client/solution/
+/clients/osm-python-client/osmclient/
+/clients/osm-javascript-client/*.json
+/clients/osm-javascript-client/*.js
+clients/osm-javascript-client/client.js
+/tools/rest-client/target/
+/system/osm-cache/target/
+/system/osm-api/nbproject/
+/system/osm-api/target/
+/system/osm-cache/target/
+/tools/jms-client/target/
+node_modules/
+/services/osm-token-service/target/
+/services/osm-api-service/target/
+/tools/infrastructure-tools/target/
+/services/osm-ingest-service/target/
+/services/osm-audit-service/target/
+/services/osm-device-service/target/
+/services/osm-infrastructure-service/target/
+/services/osm-participant-service/target/
+/services/osm-website-service/target/
+/system/osm-connector/target/
+/system/osm-batch/target/
+/system/osm-common/target/
+/tests/testsuite-deployment/target/
+/tests/testsuite-deployment/data/
+/connectors/mongo-connector/target/
+/connectors/container-connector/target/
+/tests/integration-tests/target/
+/batch/k8s-batch-runner/target/
+/connectors/folder-connector/target/
+/tests/integration-tests/activemq-data/
+/tools/client-generator/target/
+/clients/osm-java-client/target/
+/clients/osm-java-client/src/main/java/co/
+/clients/osm-javascript-client/target/
+/clients/osm-javascript-client/.eslintrc.json
+/clients/osm-dotnet-client/target/
+/clients/osm-python-client/target/
+/clients/cli/dependency-reduced-pom.xml
+/clients/osm-syncjavascript-client/client.js
+/clients/osm-syncjavascript-client/.eslintrc.json
+/clients/osm-syncjavascript-client/package.json
+.vscode/settings.json
+!/tests/integration-tests/src/test/resources/TestJar.jar
+/.temp
+__pycache__/
+k8s/providers/docker/data
+
+.DS_Store
+/docs/checklists/21 CFR Part 11 Compliance Checklist - Qualio.pdf

@@ -1,7 +1,0 @@
-co/inkspot/dmo/model/Collection.class
-co/inkspot/dmo/services/DMOUploadService.class
-co/inkspot/dmo/model/WalkingBout.class
-co/inkspot/dmo/model/Stride.class
-co/inkspot/dmo/model/Day.class
-co/inkspot/dmo/dao/DMODataAccess.class
-co/inkspot/dmo/services/DMOQueryService.class

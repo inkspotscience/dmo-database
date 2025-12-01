@@ -1,0 +1,4 @@
+com/enoda/tests/dmo/Cleanup.class
+com/enoda/tests/dmo/TestSuite.class
+com/enoda/tests/dmo/Setup.class
+com/enoda/tests/dmo/ModelTests.class

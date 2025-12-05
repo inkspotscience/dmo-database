@@ -16,15 +16,18 @@
 package co.inkspot.tests.dmo;
 
 import co.inkspot.dmo.model.Collection;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(Setup.class)
 public class ModelTests {
     private static EntityManager em;    
+    private static ObjectMapper mapper = new ObjectMapper();
     
     @BeforeAll
     public static void setUpClass() {
@@ -61,12 +65,11 @@ public class ModelTests {
         Collection c1 = new Collection();
         c1.setStudyCode("EN");
         c1.setParticipantId("235");
-        c1.setStartDate(LocalDate.now());
-        c1.setStartTime(LocalTime.now());
-        
+        c1.setStartTimestamp(System.currentTimeMillis());
         em.persist(c1);
         collectionId = c1.getId();
                 
+        System.out.println(mapper.writeValueAsString(c1));
     }
     
     @Test
@@ -83,5 +86,25 @@ public class ModelTests {
         TypedQuery<Long> q = em.createNamedQuery("Collection.countForStudy", Long.class);
         q.setParameter("studyCode", "EN");
         assertTrue(q.getSingleResult().equals(1L));
+    }
+    
+    @Test
+    @DisplayName("Create Collection with SessionID")
+    public void Test004() throws Exception {
+        Collection c1 = new Collection();
+        c1.setStudyCode("EN");
+        c1.setParticipantId("235");
+        c1.setStageName("T1");
+        c1.setSessionId("EN.235.T1");
+        em.persist(c1);
+    }
+    
+    @Test
+    @DisplayName("Retrieve Collection by Session ID")
+    public void Test005(){
+        TypedQuery<Collection> q = em.createNamedQuery("Collection.getBySessionId", Collection.class);
+        q.setParameter("sessionid", "EN.235.T1");
+        Collection c = q.getSingleResult();
+        assertNotNull(c);
     }
 }

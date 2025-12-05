@@ -15,38 +15,43 @@
  */
 package co.inkspot.dmo.services;
 
-
+import co.inkspot.dmo.api.DMOUploadService;
 import co.inkspot.dmo.dao.DMODataAccess;
 import co.inkspot.dmo.model.Collection;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
- * Service for DMO querying
+ * Service that is used to upload DMO data
  * @author hugo
  */
-@Path("/query")
-public class DMOQueryService {
-
+@Path("/dmos/upload")
+@ApplicationScoped
+public class DMOUploadServiceImpl implements DMOUploadService {
     @Inject
     DMODataAccess dmoAccess;
     
-    @GET
-    @Path("/test")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Override
     public String test(){
-        return "Hello";
+        return "Hello!";
+    }
+
+    public DMOUploadServiceImpl() {
     }
     
-    @GET
-    @Path("/collection")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Collection[] listCollections() throws Exception {
-        return dmoAccess.listCollections().toArray(new Collection[0]);
+    
+    @Override
+    @Transactional
+    public String createCollectionWithMetadata(String metadata) throws Exception {
+        return dmoAccess.populateCollectionFromMobGapMetadata(metadata).getId();
     }
+
+    @Override
+    public Collection getCollection(String id) throws Exception {
+        return dmoAccess.getCollection(id);
+    }
+    
+    
 }

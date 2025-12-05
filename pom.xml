@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.enoda</groupId>
+    <groupId>co.inkspot.osm</groupId>
     <artifactId>dmo-database</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -21,9 +21,23 @@
         <enunciate.plugin.version>2.18.1</enunciate.plugin.version>
         <jackson.version>2.9.10.5</jackson.version>
         <json.version>20250517</json.version>
+        <jersey.version>3.1.5</jersey.version>
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>co.inkspot.osm.platform.tools</groupId>
+            <artifactId>rest-client</artifactId>
+            <version>1.4.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>co.inkspot.osm.platform.system</groupId>
+            <artifactId>osm-api</artifactId>
+            <version>1.4.1-SNAPSHOT</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -38,6 +52,11 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-orm</artifactId>
         </dependency>        
+        
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jdbc-postgresql</artifactId>
+        </dependency>
         
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -74,12 +93,18 @@
         </dependency>    
                 
         <dependency>
-            <groupId>io.zonky.test</groupId>
-            <artifactId>embedded-postgres</artifactId>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
-        </dependency>
-                        
+        </dependency>                
             
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <scope>test</scope>
+            <version>${jersey.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -102,7 +127,67 @@
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite-engine</artifactId>
             <scope>test</scope>
-        </dependency>                                                                                                     
+        </dependency>            
+        
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>11.0.21</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>11.0.21</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Jersey (JAX-RS) -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Jersey CDI bridge -->
+        <dependency>
+            <groupId>org.glassfish.jersey.ext.cdi</groupId>
+            <artifactId>jersey-weld2-se</artifactId>
+            <version>3.1.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Weld SE (CDI implementation) -->
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+            <version>5.1.0.Final</version>
+            <scope>test</scope>
+        </dependency>        
+        
+        <dependency>
+            <groupId>org.jboss.weld.module</groupId>
+            <artifactId>weld-jta</artifactId>
+            <version>5.1.0.Final</version>
+            <scope>test</scope>
+        </dependency>        
+                                                                                                                                                                                          
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -161,6 +246,22 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+                    
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.plugin.version}</version>
@@ -178,35 +279,76 @@
                 </configuration>
             </plugin>        
             
-        <plugin>
-          <groupId>com.webcohesion.enunciate</groupId>
-          <artifactId>enunciate-maven-plugin</artifactId>
-          <version>${enunciate.plugin.version}</version>
-          <configuration>
-            <docsDir>${project.build.directory}/classes/META-INF/resources</docsDir>
-            <sourcepath-includes>
-              <sourcepath-include>
-                <groupId>com.enoda</groupId>
-                <artifactId>dmo-database</artifactId>
-              </sourcepath-include>
-            </sourcepath-includes>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>docs</goal>
-              </goals>
-            </execution>
-          </executions>
-          <dependencies>
-            <dependency>
-              <groupId>com.fasterxml.jackson.core</groupId>
-              <artifactId>jackson-databind</artifactId>
-              <version>${jackson.version}</version>
-            </dependency>
-          </dependencies>
+            <plugin>
+                <groupId>com.webcohesion.enunciate</groupId>
+                <artifactId>enunciate-maven-plugin</artifactId>
+                <version>${enunciate.plugin.version}</version>
+                <configuration>
+                    <docsDir>${project.build.directory}/classes/META-INF/resources</docsDir>
+                    <sourcepath-includes>
+                        <sourcepath-include>
+                            <groupId>com.enoda</groupId>
+                            <artifactId>dmo-database</artifactId>
+                        </sourcepath-include>
+                    </sourcepath-includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>docs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                        <version>${jackson.version}</version>
+                    </dependency>
+                </dependencies>
           
-        </plugin>            
+            </plugin>            
+            
+            <plugin>
+                <groupId>co.inkspot.osm.platform.tools</groupId>
+                <artifactId>client-generator</artifactId>
+                <version>1.4.1-SNAPSHOT</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>co.inkspot.osm.platform.system</groupId>
+                        <artifactId>osm-api</artifactId>
+                        <version>1.4.1-SNAPSHOT</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>co.inkspot.osm</groupId>
+                        <artifactId>dmo-database</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>                    
+
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>create-client</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>client-generator</goal>
+                        </goals>
+                        <configuration>
+                            <language>python</language>
+                            <clientname>dmoclient</clientname>
+                            <version>1.0</version>
+                            <basePackageName>co.inkspot.dmo.model</basePackageName>
+                            <folder>/target/client</folder>
+                            <extratypes>co.inkspot.dmo.model.Collection</extratypes>
+                            <endpoints>co.inkspot.dmo.api.DMOUploadService</endpoints>
+                        </configuration>                        
+                    </execution>
+                </executions>
+            </plugin>            
+
         </plugins>
     </build>
+    
+
 </project>

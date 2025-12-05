@@ -18,6 +18,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * This class represents a single day within a data collection. It closely maps
@@ -33,6 +34,9 @@ public class Day {
     
     @Column(name = "date", columnDefinition = "DATE")
     private LocalDate date;    
+    
+    @Column(name = "starttime", columnDefinition = "TIME")
+    private LocalTime startTime;
 
     public String getCollectionId() {
         return collectionId;
@@ -56,5 +60,13 @@ public class Day {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
     }
 }

@@ -24,8 +24,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.PersistenceUnit;
 
 import java.io.Serializable;
+import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -39,8 +42,11 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Collection.countForStudy", query = "SELECT COUNT(c.id) FROM Collection c WHERE c.studyCode=:studyCode")
+    @NamedQuery(name = "Collection.list", query = "SELECT c FROM Collection c"),
+    @NamedQuery(name = "Collection.countForStudy", query = "SELECT COUNT(c.id) FROM Collection c WHERE c.studyCode=:studyCode"),
+    @NamedQuery(name = "Collection.getBySessionId", query = "SELECT c FROM Collection c WHERE c.sessionId=:sessionid")
 })
+@PersistenceUnit(name = "osm")
 public class Collection implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -64,13 +70,13 @@ public class Collection implements Serializable {
     private String deviceId;
     
     @Basic
+    private String sessionId;
+    
+    @Basic
     private String stageName;
     
-    @Column(name = "startdate", columnDefinition = "DATE")
-    private LocalDate startDate;
-    
-    @Column(name = "starttime", columnDefinition = "TIME")
-    private LocalTime startTime;
+    @Basic
+    private Long startTimestamp;
 
     @Column(name = "metadata", columnDefinition = "JSON")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -120,22 +126,6 @@ public class Collection implements Serializable {
         this.stageName = stageName;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
     public String getSensorMetadata() {
         return sensorMetadata;
     }
@@ -143,4 +133,29 @@ public class Collection implements Serializable {
     public void setSensorMetadata(String sensorMetadata) {
         this.sensorMetadata = sensorMetadata;
     }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public Long getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public void setStartTimestamp(Long startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
+   
 }

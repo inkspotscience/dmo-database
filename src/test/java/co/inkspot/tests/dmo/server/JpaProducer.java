@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2025 Inkspot Science.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package co.inkspot.tests.dmo.server;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Default;
+import jakarta.enterprise.inject.Disposes;
+import jakarta.enterprise.inject.Produces;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
+
+@ApplicationScoped
+public class JpaProducer {
+
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("dmo");
+
+    @Produces
+    @ApplicationScoped
+    public EntityManagerFactory produceEMF() {
+        return emf;
+    }
+
+    @Produces
+    @RequestScoped
+    public EntityManager produceEM(EntityManagerFactory emf) {
+        return emf.createEntityManager();
+    }
+
+    public void closeEM(@Disposes EntityManager em) {
+        em.close();
+    }
+}

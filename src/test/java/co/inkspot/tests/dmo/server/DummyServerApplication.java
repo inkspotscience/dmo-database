@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package co.inkspot.tests.dmo;
+package co.inkspot.tests.dmo.server;
 
-import jakarta.persistence.EntityManager;
-import org.junit.platform.suite.api.SelectClasses;
-import org.junit.platform.suite.api.Suite;
+import org.glassfish.jersey.server.ResourceConfig;
 
 /**
- * Sets up a testing DB and co-ordinates tests
+ *
  * @author hugo
  */
-@Suite
-@SelectClasses({
-    ModelTests.class,
-    DAOTests.class,
-    UploadServiceTests.class
-})
-public class TestSuite {
-    public static EntityManager em;
+public class DummyServerApplication extends ResourceConfig {
+
+    public DummyServerApplication() {
+        packages("co.inkspot.dmo");
+    }
+    
 }

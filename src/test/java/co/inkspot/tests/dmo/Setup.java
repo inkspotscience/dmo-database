@@ -15,13 +15,11 @@
  */
 package co.inkspot.tests.dmo;
 
-import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
+import co.inkspot.tests.dmo.server.DummyServer;
+import co.inkspot.dmo.dao.DMODataAccess;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.Statement;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -35,34 +33,22 @@ public class Setup implements BeforeAllCallback, ExtensionContext.Store.Closeabl
     private static volatile boolean started = false;
     public static EntityManager em;
     public static EntityManagerFactory emf;
-    static EmbeddedPostgres postgres;
+    static DummyServer server;
     
     @Override
     public void beforeAll(ExtensionContext ec) throws Exception {
        if (!started) {
             try {
-                
-                File dataDir = new File(System.getProperty("user.home"), "osm/tests/dmo");
-                                
-                postgres = EmbeddedPostgres.builder()
-                        .setPort(5432)
-                        .setDataDirectory(dataDir)
-                        .setCleanDataDirectory(true)
-                        .start();
-                
-                        try ( Connection c = postgres.getPostgresDatabase().getConnection()) {
-                            try ( Statement s = c.createStatement()) {
-                                s.execute("CREATE USER osm WITH PASSWORD 'osmuser'");
-                                s.execute("CREATE DATABASE dmo");
-                                s.execute("GRANT ALL PRIVILEGES ON DATABASE dmo TO osm");
-                            } catch (Exception ex){
-                                throw new Exception("SQL Setup Error", ex);
-                            }
-                        }                
                 logger.info("Started embedded PostgreSQL");
                 emf = Persistence.createEntityManagerFactory("dmo");
                 em = emf.createEntityManager();
                 TestSuite.em = em;
+                
+                // Set the testing Entity Mnager
+                DMODataAccess.setEntityManager(em);
+                
+                server = new DummyServer();
+                server.start();
                 started = true;
             } catch (Exception e) {
                 started = false;
@@ -79,7 +65,8 @@ public class Setup implements BeforeAllCallback, ExtensionContext.Store.Closeabl
     public static void shutdown(){
         if(started){
             try {
-                postgres.close();
+                
+                server.stop();
             } catch (Exception e){
                 e.printStackTrace();
             }
